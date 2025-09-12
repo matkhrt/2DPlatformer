@@ -6,15 +6,18 @@ public class Player : MonoBehaviour
     private Animator anim;
 
     private float xInput;
-
-    private bool facingRight = true;
     private int facingDir = 1;
+    private bool facingRight = true;
+    private bool isAirBorn;
 
-    [Header("Movement")]
+    [Header("Movement detailes")]
     [SerializeField]
     private float moveSpeed;
     [SerializeField]
     private float jumpForce;
+    [SerializeField]
+    private float doubleJumpForce;
+    private bool canDoubleJump;
 
     [Header("Collision info")]
     [SerializeField]
@@ -31,6 +34,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        AirbornStatus();
         HandleCollision();
         HandleInput();
         HandleMovement();
@@ -38,20 +42,60 @@ public class Player : MonoBehaviour
         HandleAnimations();
     }
 
+    private void AirbornStatus()
+    {
+        if (isGrounded && isAirBorn)
+            HandleLanding();
+
+        if (!isGrounded && !isAirBorn)
+            BecomeAirBorne();
+    }
+
+    private void BecomeAirBorne()
+    {
+        isAirBorn = true;
+    }
+
+    private void HandleLanding()
+    {
+        isAirBorn = false;
+        canDoubleJump = true;
+    }
+
     private void HandleInput()
     {
         xInput = Input.GetAxisRaw("Horizontal");
 
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+
+            JumpButton();
+
+        }
+    }
+
+    private void JumpButton()
+    {
+        if (isGrounded)
         {
             Jump();
+
+        }else if (canDoubleJump)
+        {
+            DoubleJump();
         }
     }
 
     private void Jump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+    }
+
+    private void DoubleJump()
+    {
+        canDoubleJump = false;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, doubleJumpForce);
     }
 
     private void OnDrawGizmos()
@@ -73,7 +117,7 @@ public class Player : MonoBehaviour
 
     private void HandleMovement()
     {
-        rb.linearVelocity = new Vector2(xInput * moveSpeed * Time.deltaTime, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(xInput * moveSpeed, rb.linearVelocity.y);
     }
 
     private void HandleFlip()
