@@ -832,6 +832,8 @@ MonoBehaviour:
   moveSpeed: 8
   jumpForce: 15
   doubleJumpForce: 11
+  wallJumpDuration: 0.6
+  wallJumpForce: {x: 7, y: 14}
   groundCheckDistance: 0.8
   whatIsGround:
     serializedVersion: 2
@@ -965,8 +967,8 @@ Transform:
   m_GameObject: {fileID: 1889636414}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 11.72, y: -1.4738, z: 0}
-  m_LocalScale: {x: 16.50078, y: 5.4799757, z: 1}
+  m_LocalPosition: {x: 11.2523, y: -1.0239, z: 0}
+  m_LocalScale: {x: 17.43693, y: 6.3797874, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
