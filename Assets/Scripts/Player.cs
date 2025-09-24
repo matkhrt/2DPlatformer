@@ -23,6 +23,12 @@ public class Player : MonoBehaviour
     private bool canDoubleJump;
     private bool isWallJumping;
 
+    [Header("Buffer Jump")]
+    [SerializeField]
+    private float bufferJumpWindow = .025f;
+    private float bufferJumpPressed = -1;
+
+
     [Header("Wall Interactions")]
     [SerializeField]
     private float wallJumpDuration = 0.6f;
@@ -124,6 +130,8 @@ public class Player : MonoBehaviour
     {
         isAirBorn = false;
         canDoubleJump = true;
+
+        AttemptBufferJump();
     }
 
     private void HandleInput()
@@ -136,6 +144,7 @@ public class Player : MonoBehaviour
         {
 
             JumpButton();
+            BufferJumpRequest();
 
         }
     }
@@ -177,6 +186,22 @@ public class Player : MonoBehaviour
         canDoubleJump = false;
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, doubleJumpForce);
     }
+
+    private void BufferJumpRequest()
+    {
+        if (isAirBorn)
+            bufferJumpPressed = Time.time;
+    }
+
+    private void AttemptBufferJump()
+    {
+        if (Time.time < bufferJumpPressed + bufferJumpWindow)
+        {
+            bufferJumpPressed = 0;
+            Jump();
+        }
+    }
+    
 
     private void OnDrawGizmos()
     {
