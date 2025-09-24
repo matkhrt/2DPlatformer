@@ -23,10 +23,14 @@ public class Player : MonoBehaviour
     private bool canDoubleJump;
     private bool isWallJumping;
 
-    [Header("Buffer Jump")]
+    [Header("Buffer & Coyote Jumo")]
     [SerializeField]
     private float bufferJumpWindow = .025f;
-    private float bufferJumpPressed = -1;
+    private float bufferJumpActivated = -1;
+    [SerializeField]
+    private float coyoteJumpWindow = 0.5f;
+    private float coyoteJumpActivated = -1;
+    
 
 
     [Header("Wall Interactions")]
@@ -42,7 +46,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Vector2 knockBackForce;
     private bool isKnocked;
-    private bool canBeKnocked;
+    
 
 
 
@@ -103,12 +107,11 @@ public class Player : MonoBehaviour
 
     private IEnumerator KnockBackRoutine()
     {
-        canBeKnocked = false;
+        
         isKnocked = true;
 
         yield return new WaitForSeconds(knockBackDuration);  
 
-        canBeKnocked = true;
         isKnocked = false;
     }
 
@@ -124,6 +127,13 @@ public class Player : MonoBehaviour
     private void BecomeAirBorne()
     {
         isAirBorn = true;
+
+        if (rb.linearVelocity.y < 0)
+        {
+
+            ActivateCoyotejump();
+
+        }
     }
 
     private void HandleLanding()
@@ -151,8 +161,15 @@ public class Player : MonoBehaviour
 
     private void JumpButton()
     {
-        if (isGrounded)
+        bool coyoteJumpAvailable = Time.time < coyoteJumpActivated + coyoteJumpWindow;
+         
+        if (isGrounded || coyoteJumpAvailable)
         {
+            if (coyoteJumpAvailable)
+            {
+                Debug.Log("Coyote");
+            }
+
             Jump();
 
         }else if(isWallDetected && !isGrounded)
@@ -164,6 +181,8 @@ public class Player : MonoBehaviour
         {
             DoubleJump();
         }
+
+        DeactiveCoyoteJump();
     }
 
     private void Jump()
@@ -190,16 +209,26 @@ public class Player : MonoBehaviour
     private void BufferJumpRequest()
     {
         if (isAirBorn)
-            bufferJumpPressed = Time.time;
+            bufferJumpActivated = Time.time;
     }
 
     private void AttemptBufferJump()
     {
-        if (Time.time < bufferJumpPressed + bufferJumpWindow)
+        if (Time.time < bufferJumpActivated + bufferJumpWindow)
         {
-            bufferJumpPressed = 0;
+            bufferJumpActivated = Time.time - 1;
             Jump();
         }
+    }
+
+    private void ActivateCoyotejump()
+    {
+        coyoteJumpActivated = Time.time;
+    }
+
+    private void DeactiveCoyoteJump()
+    {
+        coyoteJumpActivated = Time.time - 1;
     }
     
 
@@ -240,14 +269,6 @@ public class Player : MonoBehaviour
         bool canWallSlide = isWallDetected && rb.linearVelocity.y < 0;
         float yModifier = yInput < 0 ? 1 : 0;
 
-        //if (yInput < 0)
-        //{
-        // yModifier = 1;
-        // }
-        // else
-        //{
-        // yModifier = 0.5f;
-        //}
 
         if (!canWallSlide)
             return;
